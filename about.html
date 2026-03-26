@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Học tiếng Anh: Modern Company Operations</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    
+    <style>
+        /* Toàn bộ UI dùng font Arial thẳng, dễ đọc */
+        * {
+            font-family: Arial, Helvetica, sans-serif !important;
+            font-style: normal !important;
+        }
+
+        body { 
+            background-color: #f1f5f9; 
+            height: 100vh; 
+            overflow: hidden; 
+            margin: 0;
+            color: #1e293b;
+        }
+
+        /* Nội dung bài đọc/văn bản cột trái - Size chuẩn 1.1rem */
+        .article-content, .article-content p, .article-content span { 
+            font-family: 'Merriweather', serif !important; 
+            line-height: 1.8; 
+            font-size: 1.1rem; 
+        }
+
+        .scroll-container { 
+            height: calc(100vh - 220px); 
+            overflow-y: auto; 
+        }
+        .scroll-container::-webkit-scrollbar { width: 6px; }
+        .scroll-container::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+
+        /* Khung Tiếng Việt Luyện Dịch (Cũ) / Tiêu đề */
+        .translation-prompt-box { 
+            background-color: #5850ec; 
+            border-radius: 9999px; 
+            padding: 1.2rem 2.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            display: inline-block;
+            width: 100%;
+        }
+
+        .vi-translation-text { 
+            color: #ffffff; 
+            font-weight: 700; 
+            font-size: 1.25rem; 
+            line-height: 1.4;
+        }
+
+        /* Nút điều hướng */
+        .nav-pill { 
+            transition: all 0.3s; 
+            cursor: pointer; 
+            white-space: nowrap; 
+            font-weight: 700 !important; 
+            color: #4338ca;
+            border: 1px solid #e2e8f0;
+            background-color: #ffffff;
+            font-size: 1rem;
+        }
+        .nav-pill:hover { background-color: #f1f5f9; }
+        .nav-pill.active {
+            background-color: #5850ec !important;
+            color: white !important;
+            box-shadow: 0 4px 12px rgba(88, 80, 236, 0.3);
+            border-color: #5850ec !important;
+        }
+
+        /* Khung nhập liệu Grammar (Pill tím mỏng) */
+        .grammar-input {
+            display: inline-block;
+            min-width: 200px;
+            padding: 2px 25px;
+            border: none;
+            border-radius: 9999px;
+            outline: none;
+            text-align: center;
+            font-weight: 700;
+            color: white;
+            margin: 12px 15px; 
+            font-size: 1.15rem;
+            background-color: #5850ec; 
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            vertical-align: middle; 
+            line-height: 1.5;
+        }
+        .grammar-input::placeholder { color: rgba(255,255,255,0.4); font-weight: 400; font-size: 0.9rem; }
+        .grammar-input.orange-sample { background-color: #f97316; }
+
+        /* Dictation Input (Bài Nghe) */
+        .dictation-input {
+            width: 100%;
+            padding: 12px 20px 12px 48px;
+            border: 1px solid #e2e8f0; /* Giống viền của thanh điều hướng */
+            border-radius: 9999px;
+            outline: none;
+            color: #4338ca; /* Màu tím/xanh đậm giống Bài luyện đọc 1 */
+            font-weight: 700 !important; /* Đưa về 700 (Bold chuẩn) để khắc phục lỗi chữ nhòe/viền bóng */
+            background-color: #ffffff; /* Nền trắng */
+            text-align: left;
+            margin: 0;
+            transition: all 0.2s;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05); /* Bóng mờ nhẹ */
+            font-size: 1.15rem;
+        }
+        .dictation-input::placeholder { color: #cbd5e1; font-weight: 400 !important; }
+        .dictation-input:focus { border-color: #4338ca; box-shadow: 0 0 0 3px rgba(67, 56, 202, 0.15); }
+
+        /* Card bài tập (Nền trắng) */
+        .grammar-item-card {
+            background-color: white;
+            border-radius: 2.5rem;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            border: 1px solid #e2e8f0;
+        }
+
+        .writing-input {
+            width: 100%;
+            padding: 18px 25px;
+            border: 2px solid #e2e8f0;
+            border-radius: 9999px;
+            outline: none;
+            transition: all 0.2s;
+            font-size: 1.15rem;
+            background-color: white;
+        }
+        
+        .header-title { font-weight: 700 !important; font-size: 1.8rem; }
+
+        #global-submit-btn {
+            font-weight: 700 !important;
+            text-transform: uppercase !important;
+            height: 60px;
+            background-color: #c2410c;
+            color: white;
+            border-radius: 12px;
+            padding: 0 3rem;
+            font-size: 1.1rem;
+        }
+
+        /* Bảng Grammar - Đồng bộ 1.25rem cho tất cả cột */
+        .grammar-table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+        .grammar-table th { background-color: #5850ec; color: white; padding: 15px; text-align: center; border: 1px solid #cbd5e1; text-transform: uppercase; font-size: 1rem; }
+        .grammar-table td { 
+            padding: 18px; 
+            border: 1px solid #cbd5e1; 
+            vertical-align: middle; 
+            font-size: 1.25rem !important; 
+            color: #1e293b;
+            line-height: 1.4;
+        }
+        .grammar-table td:first-child { font-weight: 700; color: #5850ec; text-align: center; width: 140px; }
+        .grammar-table td:nth-child(2) { 
+            font-style: italic; 
+            font-weight: 700; 
+            white-space: nowrap; 
+        }
+        .grammar-table tr:nth-child(even) { background-color: #f8fafc; }
+        
+        /* Grid Layout đặc biệt cho tab Grammar (65/35) */
+        .grammar-grid { grid-template-columns: 1fr; }
+        @media (min-width: 1024px) {
+            .grammar-grid { grid-template-columns: 65% 35% !important; }
+        }
+
+        .fade-in { animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .correct-bg { background-color: #ecfdf5; border-left: 8px solid #10b981; }
+        .wrong-bg { background-color: #fef2f2; border-left: 8px solid #ef4444; }
+    </style>
+</head>
+<body class="flex flex-col">
+    <!-- Header -->
+    <header class="bg-[#c2410c] text-white p-4 md:px-12 flex flex-col md:flex-row justify-between items-center shrink-0 shadow-md">
+        <div class="overflow-hidden w-full md:w-auto text-center md:text-left">
+            <h1 id="main-title" class="header-title uppercase tracking-tight">LANGUAGE LEARNING CENTER</h1>
+            <p id="sub-title" class="text-orange-100 text-xs md:text-sm font-bold opacity-90 uppercase tracking-widest">Professional English Course</p>
+        </div>
+        <div class="hidden lg:block">
+            <span class="bg-white/20 px-5 py-1.5 rounded-full text-[11px] font-bold tracking-tighter uppercase border border-white/30">Session 1: Operations & Grammar</span>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="bg-white p-3 border-b border-gray-200 flex justify-center gap-2 md:gap-4 shadow-sm shrink-0 overflow-x-auto no-scrollbar">
+        <button onclick="switchLesson(0)" class="nav-pill px-6 py-2.5 rounded-full shadow-sm" id="btn-0">Bài luyện đọc 1</button>
+        <button onclick="switchLesson(1)" class="nav-pill px-6 py-2.5 rounded-full shadow-sm" id="btn-1">Bài luyện đọc 2</button>
+        <button onclick="switchLesson(2)" class="nav-pill px-6 py-2.5 rounded-full shadow-sm" id="btn-2">Bài luyện đọc 3</button>
+        <button onclick="switchLesson(3)" class="nav-pill px-6 py-2.5 rounded-full shadow-sm active" id="btn-3">Bài luyện nghe</button>
+        <button onclick="switchLesson(4)" class="nav-pill px-6 py-2.5 rounded-full shadow-sm" id="btn-4">Luyện phản xạ từ vựng</button>
+    </nav>
+
+    <!-- Main Content -->
+    <main id="main-container" class="flex-grow grid grid-cols-1 lg:grid-cols-2 overflow-hidden bg-white">
+        <!-- Left Column -->
+        <section class="scroll-container p-6 md:p-10 border-r border-gray-100 bg-white fade-in" id="left-column">
+            <div class="flex items-center gap-2 mb-6 text-orange-600 border-b-2 border-orange-50 pb-2">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832(5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+                <h3 id="left-heading" class="font-bold uppercase tracking-widest text-sm text-slate-500">Nội dung học tập</h3>
+            </div>
+            <article id="passage-content" class="article-content text-gray-800 space-y-6">
+                <!-- JS Inject -->
+            </article>
+        </section>
+
+        <!-- Right Column -->
+        <section class="scroll-container p-6 md:p-10 bg-slate-50/50 fade-in" id="right-column">
+            <div class="flex items-center gap-2 mb-6 text-indigo-600 border-b-2 border-indigo-50 pb-2">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
+                <h3 id="right-title" class="font-bold uppercase tracking-widest text-sm text-slate-500">Phần làm bài</h3>
+            </div>
+            <div id="content-box" class="space-y-10 pb-10">
+                <!-- JS Inject -->
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="shrink-0 bg-white border-t p-4 md:px-12 flex flex-col md:flex-row justify-between items-center gap-6 shadow-inner">
+        <div id="input-area" class="flex flex-col md:flex-row items-center gap-6 w-full md:w-auto">
+            <input type="text" id="user-name" class="w-full md:w-[400px] p-4 border-2 border-orange-200 rounded-xl text-center font-bold text-xl outline-none focus:border-orange-500 shadow-sm" placeholder="HỌ VÀ TÊN CỦA BẠN...">
+            <button id="global-submit-btn" onclick="handleGlobalSubmit()" class="w-full md:w-auto px-16 shadow-lg uppercase">Nộp Toàn Bộ Bài Làm</button>
+        </div>
+        <div id="result-status" class="hidden">
+            <div class="flex items-center gap-6 bg-indigo-700 text-white px-10 py-4 rounded-2xl shadow-xl border-2 border-white/20">
+                <p class="font-bold text-lg tracking-tight uppercase">ĐÃ NỘP BÀI THÀNH CÔNG</p>
+                <div class="w-px h-8 bg-white/30"></div>
+                <p class="text-[10px] font-bold uppercase opacity-80 max-w-[150px]">Xem kết quả ở các Tab bài học</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        emailjs.init("eE_LKbw1zMcbYCKzX");
+        let isGlobalSubmitted = false;
+        let currentLessonIndex = 3; 
+
+        // Biến toàn cục quản lý trạng thái phát Audio Bài Nghe (Lưu trữ index của bài đang phát)
+        let currentlyPlayingPart = null;
+
+        function speak(text) {
+            if (!window.speechSynthesis) return;
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'en-US';
+            utterance.rate = 0.9;
+            window.speechSynthesis.speak(utterance);
+        }
+
+        function toggleDialoguePlay(partIndex) {
+            if (!window.speechSynthesis) return;
+            
+            if (currentlyPlayingPart === partIndex) {
+                window.speechSynthesis.cancel();
+                currentlyPlayingPart = null;
+                renderDictationSpeakerBtns();
+                return;
+            }
+
+            if (currentlyPlayingPart !== null) {
+                window.speechSynthesis.cancel();
+            }
+
+            currentlyPlayingPart = partIndex;
+            renderDictationSpeakerBtns();
+
+            const lesson = lessons[3]; // Dictation lesson
+            const part = lesson.parts[partIndex];
+            let i = 0;
+            
+            function speakNext() {
+                if (currentlyPlayingPart !== partIndex) return;
+                if (i >= part.dialogueAudio.length) {
+                    currentlyPlayingPart = null;
+                    renderDictationSpeakerBtns();
+                    return;
+                }
+                
+                const line = part.dialogueAudio[i];
+                const utterance = new SpeechSynthesisUtterance(line.text);
+                utterance.lang = 'en-US';
+                
+                // Điều chỉnh tốc độ chậm lại một chút để dễ nghe hơn trong bài Dictation
+                utterance.rate = 0.85; 
+                // Đưa độ cao giọng (pitch) về chuẩn 1.0 để giọng nghe tự nhiên, rõ ràng, không bị ồ/trầm hoặc chói
+                utterance.pitch = 1.0; 
+                
+                // Lọc danh sách giọng đọc tiếng Anh để tránh bị lỗi giọng
+                const voices = window.speechSynthesis.getVoices();
+                const engVoices = voices.filter(v => v.lang.startsWith('en'));
+
+                if (line.gender === 'male') {
+                    // Ưu tiên các giọng nam chuẩn, rõ ràng
+                    const maleVoice = engVoices.find(v => 
+                        v.name.includes('David') || 
+                        (v.name.includes('Google') && v.name.includes('Male')) || 
+                        v.name.toLowerCase().includes('male') ||
+                        v.name.includes('Daniel') ||
+                        v.name.includes('Mark')
+                    );
+                    if(maleVoice) utterance.voice = maleVoice;
+                } else {
+                    // Ưu tiên các giọng nữ chuẩn, rõ ràng
+                    const femaleVoice = engVoices.find(v => 
+                        v.name === 'Google US English' || 
+                        v.name.includes('Zira') || 
+                        v.name.includes('Samantha') || 
+                        v.name.toLowerCase().includes('female') ||
+                        v.name.includes('Karen') ||
+                        v.name.includes('Victoria')
+                    );
+                    if(femaleVoice) utterance.voice = femaleVoice;
+                }
+
+                utterance.onend = () => {
+                    i++;
+                    speakNext();
+                };
+                utterance.onerror = () => {
+                    currentlyPlayingPart = null;
+                    renderDictationSpeakerBtns();
+                };
+                
+                window.speechSynthesis.speak(utterance);
+            }
+            
+            if (window.speechSynthesis.getVoices().length === 0) {
+                window.speechSynthesis.onvoiceschanged = () => {
+                    if (currentlyPlayingPart === partIndex) speakNext();
+                };
+            } else {
+                speakNext();
+            }
+        }
+
+        function renderDictationSpeakerBtns() {
+            const lesson = lessons[3];
+            if (!lesson || lesson.type !== 'dictation') return;
+
+            lesson.parts.forEach((_, partIndex) => {
+                const btn = document.getElementById(`dictation-play-btn-${partIndex}`);
+                if (!btn) return;
+                if (currentlyPlayingPart === partIndex) {
+                    btn.innerHTML = `<svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 10a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z"></path></svg><span class="ml-2 font-bold text-lg">Dừng phát Audio</span>`;
+                    btn.classList.add('bg-red-100', 'text-red-600', 'border-red-300');
+                    btn.classList.remove('bg-orange-100', 'text-orange-600', 'border-orange-300');
+                } else {
+                    btn.innerHTML = `<svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"></path></svg><span class="ml-2 font-bold text-lg">Phát Audio Bài Nghe</span>`;
+                    btn.classList.remove('bg-red-100', 'text-red-600', 'border-red-300');
+                    btn.classList.add('bg-orange-100', 'text-orange-600', 'border-orange-300');
+                }
+            });
+        }
+
+        // --- HÀM HỖ TRỢ CHẤM ĐIỂM ---
+        function isCorrectText(user, correct) {
+            if(!user || !correct) return false;
+            // Xóa dấu câu, khoảng trắng thừa và đưa về chữ thường để so sánh
+            const cUser = user.toLowerCase().replace(/[.,!?;:]/g, '').replace(/\s+/g, ' ').trim();
+            const cCorrect = correct.toLowerCase().replace(/[.,!?;:]/g, '').replace(/\s+/g, ' ').trim();
+            return cUser === cCorrect;
+        }
+
+        function generateDiffHTML(userAns, correctAns) {
+            if (!userAns) return '<span>(Bạn chưa nhập câu trả lời)</span>';
+            const userWords = userAns.trim().split(/\s+/);
+            const correctWords = correctAns.trim().split(/\s+/);
+            let result = [];
+            
+            for (let i = 0; i < userWords.length; i++) {
+                const cleanUser = userWords[i].toLowerCase().replace(/[.,!?;:]/g, '');
+                const cleanCorrect = correctWords[i] ? correctWords[i].toLowerCase().replace(/[.,!?;:]/g, '') : '';
+                
+                if (cleanUser === cleanCorrect) {
+                    result.push(userWords[i]);
+                } else {
+                    result.push(`<span class="text-red-600 font-extrabold underline decoration-2">${userWords[i]}</span>`);
+                }
+            }
+            return result.join(' ');
+        }
+        
+        // --- LOGIC PHẢN XẠ TỪ VỰNG ---
+        const reflexVocabList = [
+            "Fast-paced", "Constant", "Pressure", "Fulfilling", "Maintain", "Well-being", "Engage in", "Passionate", "Temporarily", "Escape", "Hidden", "Promote", "Mindset", "Dedication", "Consistent", "Substantial", "Initially", "Struggle", "Enhance", "Impact", "Isolated", "Perspective", "Neglect", "Commitment", "Complement", "Realize", "Habit", "Attractive", "Meaningful", "Positive", "Mental state", "Focus on", "Stress", "Sense of calm", "Express", "Overall", "Mood", "Develop", "Ability", "Progress", "Noticeable", "Improvement", "Confidently", "Gradual", "Motivation", "Encourage", "Value", "Beneficial", "Routine", "Interaction", "Era", "Connectivity", "Fragmented", "Occupied", "Backdrop", "Sustained", "Distinguish", "Passive", "Cultivate", "Foster", "Characterize", "Steady", "Persistence", "Tolerance", "Yield", "Tangible", "Reinforce", "Competence", "Avenue", "Facilitate", "Mutual", "Enthusiasm", "Encroach", "Disrupt", "Inclined", "Paint", "Garden", "Play musical instrument", "Craft", "Photography", "Cycle", "Relieve stress", "Refresh the mind", "Forget about daily pressures", "Express emotions", "Relax", "Improve concentration", "Feel more balanced mentally", "Capture better images", "Understand lighting techniques", "Build social connections", "Shared interest", "Expand their social circle", "Form friendships", "Exchange experiences", "Healthier lifestyle", "Physical fitness", "Improve mood", "Sedentary life", "Develop new skills", "Require practice and patience", "A sense of achievement", "Build confidence", "Personal growth", "Engage in a hobby", "Take up a hobby", "Spend time on hobbies", "Develop a passion for something", "Pursue a hobby", "Play a significant role in", "It is an effective way to", "It allows sb to", "Make sth adj", "Contribute to", "Lead to", "Spend time on", "Spend effort on", "Tend to", "Concentrate on", "Turn to"
+        ];
+
+        function buildReflexQuestions() {
+            let shuffled = [...reflexVocabList].sort(() => 0.5 - Math.random());
+            let selected = shuffled.slice(0, 30);
+            return selected.map(word => {
+                let wrongOptions = shuffled.filter(w => w !== word).sort(() => 0.5 - Math.random()).slice(0, 3);
+                let options = [word, ...wrongOptions].sort(() => 0.5 - Math.random());
+                let ansChar = String.fromCharCode(65 + options.indexOf(word));
+                return {
+                    q: word, 
+                    options: options,
+                    ans: ansChar,
+                    exp: "Từ vựng được đọc là: " + word
+                };
+            });
+        }
+
+        let reflexTimerInterval = null;
+        let reflexTimeLeft = 5;
+
+        function startReflexGame() {
+            const lesson = lessons[4];
+            lesson.isStarted = true;
+            lesson.currentIndex = 0;
+            renderView();
+            startReflexQuestion();
+        }
+
+        function startReflexQuestion() {
+            const lesson = lessons[4];
+            if (lesson.currentIndex >= 30) {
+                renderView();
+                return;
+            }
+            
+            speak(lesson.questions[lesson.currentIndex].q);
+            reflexTimeLeft = 5;
+            clearInterval(reflexTimerInterval);
+            
+            const timerEl = document.getElementById('reflex-timer');
+            if(timerEl) timerEl.innerText = reflexTimeLeft + 's';
+            
+            reflexTimerInterval = setInterval(() => {
+                reflexTimeLeft--;
+                const timerEl = document.getElementById('reflex-timer');
+                if(timerEl) timerEl.innerText = reflexTimeLeft + 's';
+                
+                if (reflexTimeLeft <= 0) {
+                    clearInterval(reflexTimerInterval);
+                    handleReflexAnswer(null); // time's up
+                }
+            }, 1000);
+        }
+
+        function handleReflexAnswer(ans) {
+            clearInterval(reflexTimerInterval);
+            const lesson = lessons[4];
+            lesson.studentAnswers[lesson.currentIndex] = ans;
+            lesson.currentIndex++;
+            renderView();
+            if (lesson.currentIndex < 30) {
+                setTimeout(startReflexQuestion, 500); // Tạm nghỉ nhẹ 0.5s trước câu mới
+            }
+        }
+        // ----------------------------
+
+        const lessons = [
+            {
+                type: "reading",
+                title: "READING COMPREHENSION",
+                sub: "BÀI LUYỆN ĐỌC 1",
+                passageTitle: "Life in the Digital Era",
+                passageContent: [
+                    "In today’s fast-paced era, people are more connected than ever before. Thanks to modern connectivity, communication has become easier and faster. However, this constant connection also brings pressure and affects people’s mental state. Many individuals are always occupied with messages, notifications, and online interaction. As a result, their daily life often becomes fragmented, and it is difficult to focus on one task for a long time.",
+                    "This situation has a noticeable impact on students and young workers. Many of them feel isolated, even though they communicate online every day. Instead of meaningful interaction, they often spend time on passive activities such as scrolling through social media. Over time, this habit can lead to stress and a negative mindset. People may also neglect their health and overall well-being, especially when they live a sedentary life.",
+                    "To deal with these problems, many people are trying to develop a healthier routine. They are becoming more aware of the importance of maintaining a positive mental state and learning how to relieve stress. Some people choose to focus on improving their physical fitness, while others try to engage in activities that help them feel more balanced mentally. Even small changes, when done with dedication and persistence, can bring substantial improvement.",
+                    "Another important factor is mindset. People who are passionate about self-development are more inclined to change their habits. At first, they may struggle initially, especially when they try to reduce screen time. However, with consistent effort, they begin to notice gradual progress. Their ability to concentrate on tasks becomes stronger, their mood becomes more positive, and their confidence grows noticeably.",
+                    "In addition, developing better habits can also promote stronger social relationships. When people spend less time online and more time communicating directly, their relationships become more meaningful. Real-life conversations allow people to express emotions more naturally and build mutual understanding. This not only improves their mental state, but also helps them realize the true value of personal connections.",
+                    "Overall, life in the digital world offers many advantages, but it also creates new challenges. To maintain a healthy and balanced life, people need commitment, dedication, and a positive mindset. With steady effort and persistence, it is possible to reduce stress, improve well-being, and create a more fulfilling life in the modern era."
+                ],
+                questions: [
+                    { q: "What is the topic of this passage?", options: ["The history of modern communication.", "The benefits and challenges of the digital era and how to balance them.", "How to completely stop using social media.", "The negative impact of physical fitness on mental health."], ans: "B", exp: "Bài viết thảo luận về những lợi ích, thách thức của thời đại số và các cách để cân bằng cuộc sống." },
+                    { q: "The word \"fragmented\" in paragraph 1 is closest in meaning to ________.", options: ["broken into small parts", "completely destroyed", "highly organized", "firmly connected"], ans: "A", exp: "\"Fragmented\" có nghĩa là bị phân mảnh, chia nhỏ (broken into small parts)." },
+                    { q: "According to paragraph 1, what is one negative consequence of constant connection?", options: ["Communication becomes easier and faster.", "People are no longer able to use the internet.", "It is difficult to focus on one task for a long time.", "People completely stop interacting online."], ans: "C", exp: "Đoạn 1 nêu: \"As a result, their daily life often becomes fragmented, and it is difficult to focus on one task for a long time.\"" },
+                    { q: "The word \"them\" in paragraph 2 refers to ________.", options: ["students and young workers", "meaningful interactions", "online communities", "passive activities"], ans: "A", exp: "\"Many of them feel isolated...\" đại từ 'them' thay thế cho cụm \"students and young workers\" ở câu ngay trước đó." },
+                    { q: "According to paragraph 2, what habit can lead to stress and a negative mindset?", options: ["Having meaningful interactions.", "Scrolling through social media passively.", "Taking care of overall well-being.", "Communicating face-to-face."], ans: "B", exp: "Đoạn 2 chỉ ra: \"...they often spend time on passive activities such as scrolling through social media. Over time, this habit can lead to stress and a negative mindset.\"" },
+                    { q: "It can be inferred from paragraph 3 that ________.", options: ["developing a healthier routine does not require any effort.", "people should only focus on physical fitness and ignore mental balance.", "small but consistent changes can lead to significant positive results.", "relieving stress is impossible in the modern digital era."], ans: "C", exp: "Từ câu: \"Even small changes, when done with dedication and persistence, can bring substantial improvement\" có thể suy ra những thay đổi nhỏ nhưng kiên trì sẽ mang lại kết quả lớn." },
+                    { q: "The phrase \"inclined to\" in paragraph 4 is closest in meaning to ________.", options: ["forced to", "likely to", "afraid to", "unable to"], ans: "B", exp: "\"Inclined to\" có nghĩa là có khuynh hướng, sẵn lòng muốn làm gì đó, tương đương với \"likely to\"." },
+                    { q: "According to paragraph 4, what happens when people consistently try to reduce screen time?", options: ["They fail completely and give up.", "Their ability to concentrate and their confidence improve.", "They struggle forever without any progress.", "They become more aggressive and stressed."], ans: "B", exp: "Đoạn 4: \"...with consistent effort, they begin to notice gradual progress. Their ability to concentrate... becomes stronger... and their confidence grows noticeably.\"" },
+                    { q: "According to paragraph 5, real-life conversations help people to ________.", options: ["express emotions more naturally and build mutual understanding.", "spend more time online with strangers.", "realize the value of scrolling through social media.", "avoid building any personal connections."], ans: "A", exp: "Đoạn 5 nêu rõ: \"Real-life conversations allow people to express emotions more naturally and build mutual understanding.\"" },
+                    { q: "It can be inferred from the final paragraph that ________.", options: ["the digital world only offers challenges and no advantages.", "a fulfilling life is guaranteed as long as you own a smartphone.", "maintaining a balanced life in the digital era requires personal effort and a good attitude.", "people should completely abandon modern technology to find happiness."], ans: "C", exp: "Tác giả kết luận: \"To maintain a healthy and balanced life, people need commitment, dedication, and a positive mindset.\" Điều này ngụ ý cần sự nỗ lực cá nhân và thái độ tốt." }
+                ],
+                studentAnswers: new Array(10).fill(null),
+                newVocab: [
+                    { word: "Occupied", ipa: "/ˈɑːkjupaɪd/", type: "adj", meaning: "Bị chiếm dụng thời gian, bận rộn" },
+                    { word: "Fragmented", ipa: "/fræɡˈmentɪd/", type: "adj", meaning: "Bị phân mảnh, chia nhỏ" },
+                    { word: "Isolated", ipa: "/ˈaɪsəleɪtɪd/", type: "adj", meaning: "Bị cô lập, cách ly" },
+                    { word: "Passive", ipa: "/ˈpæsɪv/", type: "adj", meaning: "Thụ động" },
+                    { word: "Sedentary", ipa: "/ˈsednteri/", type: "adj", meaning: "Ít vận động, ngồi nhiều" },
+                    { word: "Substantial", ipa: "/səbˈstænʃl/", type: "adj", meaning: "Đáng kể, quan trọng" },
+                    { word: "Persistence", ipa: "/pərˈsɪstəns/", type: "n", meaning: "Sự kiên trì, bền bỉ" },
+                    { word: "Inclined", ipa: "/ɪnˈklaɪnd/", type: "adj", meaning: "Có khuynh hướng, muốn (làm gì)" },
+                    { word: "Dedication", ipa: "/ˌdedɪˈkeɪʃn/", type: "n", meaning: "Sự cống hiến, tận tâm" },
+                    { word: "Mutual", ipa: "/ˈmjuːtʃuəl/", type: "adj", meaning: "Lẫn nhau, chung" }
+                ]
+            },
+            {
+                type: "reading",
+                title: "READING COMPREHENSION",
+                sub: "BÀI LUYỆN ĐỌC 2",
+                passageTitle: "The Value of Collecting in Modern Life",
+                passageContent: [
+                    "In today’s fast-paced era, many people are always under constant pressure and often feel mentally occupied. Because of this, more individuals are turning to collecting as a way to relax and improve their mental state. Although collecting may seem like a simple activity, it actually plays a meaningful role in people’s lives.",
+                    "People collect many different things, such as stamps, coins, photographs, or even small objects that others might consider hidden or unimportant. At first, most collectors begin temporarily, simply because they are passionate about a particular object. However, as time passes, this activity often develops into a regular habit. With enough dedication and persistence, collecting can become a valuable part of a person’s daily routine.",
+                    "One of the main reasons why collecting is so attractive is that it helps people escape daily stress. When collectors spend time organizing their collections, they can focus on something calm and relaxing. This helps them relieve stress, improve their mood, and create a strong sense of calm. As a result, their overall well-being becomes more positive, and they feel more balanced mentally.",
+                    "Collecting also helps people develop new skills. For example, collectors must learn how to distinguish between valuable and common items. They also need patience, tolerance, and the ability to notice small details. At the beginning, many collectors struggle initially, especially when they cannot find rare items. However, with consistent effort, they begin to see noticeable improvement. This gradual progress gives them motivation and increases their confidence.",
+                    "In addition, collecting can help people build social connections. Many collectors join clubs or online groups where they can exchange experiences and share interests. These interactions often lead to new friendships and stronger relationships based on mutual enthusiasm. In a world where many people feel isolated, collecting provides a more meaningful form of interaction.",
+                    "Overall, collecting is not only a way to spend free time, but also an effective way to improve well-being, develop patience, and encourage personal growth. Even in a busy and fast-paced world, this simple activity can bring substantial benefits and make life more fulfilling."
+                ],
+                questions: [
+                    { q: "What is the main idea of the passage?", options: ["The history of collecting stamps and coins in the modern era.", "The psychological and social benefits of the collecting hobby.", "How to correctly distinguish valuable items from common ones.", "The negative effects of constant pressure and stress in daily life."], ans: "B", exp: "Đoạn văn chủ yếu nói về những lợi ích tâm lý (giảm stress, tăng tự tin) và lợi ích xã hội (kết bạn) của sở thích sưu tầm." },
+                    { q: "The word \"occupied\" in paragraph 1 is closest in meaning to ________.", options: ["empty", "relaxed", "busy", "successful"], ans: "C", exp: "\"Occupied\" trong ngữ cảnh \"mentally occupied\" có nghĩa là tâm trí luôn bận rộn, đầy ắp suy nghĩ (busy)." },
+                    { q: "According to paragraph 2, how do most people usually start their collecting habit?", options: ["By joining a large online group of collectors.", "By spending a lot of money on valuable items.", "By looking for hidden objects to sell them later.", "Temporarily, out of passion for a specific object."], ans: "D", exp: "Đoạn 2 ghi rõ: \"At first, most collectors begin temporarily, simply because they are passionate about a particular object.\"" },
+                    { q: "The word \"This\" in paragraph 3 refers to ________.", options: ["escaping daily stress", "the main reason", "focusing on something calm and relaxing", "creating a strong sense of calm"], ans: "C", exp: "Đại từ \"This\" thay thế cho hành động ở câu trước đó: \"...they can focus on something calm and relaxing. This helps them...\" (Việc tập trung vào một thứ gì đó tĩnh lặng và thư giãn giúp họ...)" },
+                    { q: "It can be inferred from paragraph 4 that ________.", options: ["collectors do not need any specific skills to be successful.", "finding rare items is always easy for beginners.", "the challenges in the beginning can be overcome with continuous effort.", "collectors usually lose their motivation when they struggle."], ans: "C", exp: "Từ việc người sưu tầm ban đầu gặp khó khăn (struggle initially) nhưng với nỗ lực bền bỉ (consistent effort) sẽ thấy sự tiến bộ (noticeable improvement), suy ra khó khăn ban đầu có thể vượt qua bằng sự nỗ lực." },
+                    { q: "The phrase \"distinguish between\" in paragraph 4 is closest in meaning to ________.", options: ["mix up", "differentiate", "connect", "purchase"], ans: "B", exp: "\"Distinguish between\" có nghĩa là phân biệt giữa các thứ với nhau, tương đồng với \"differentiate\"." },
+                    { q: "According to paragraph 5, what is a social benefit of collecting?", options: ["It helps people avoid meaningful interactions.", "It encourages people to isolate themselves from the world.", "It provides opportunities to form friendships based on shared interests.", "It forces people to compete with each other in online groups."], ans: "C", exp: "Đoạn 5 nêu: \"These interactions often lead to new friendships and stronger relationships based on mutual enthusiasm.\"" },
+                    { q: "The word \"mutual\" in paragraph 5 is closest in meaning to ________.", options: ["shared", "personal", "different", "competitive"], ans: "A", exp: "\"Mutual\" có nghĩa là chung, qua lại lẫn nhau (shared)." },
+                    { q: "Which of the following is NOT mentioned as a benefit of collecting in the passage?", options: ["Earning a substantial amount of money.", "Improving overall well-being.", "Developing patience and new skills.", "Building stronger social relationships."], ans: "A", exp: "Bài đọc đề cập đến cải thiện sức khỏe (well-being), phát triển sự kiên nhẫn/kỹ năng, và xây dựng mối quan hệ xã hội. Việc kiếm nhiều tiền (Earning money) KHÔNG được nhắc đến." },
+                    { q: "What is the author's main conclusion in the final paragraph?", options: ["Collecting is only suitable for people with a lot of free time.", "Despite being simple, collecting offers significant life-enhancing benefits.", "People should prioritize their professional careers over simple activities.", "Collecting is the only way to survive in a fast-paced world."], ans: "B", exp: "Đoạn cuối kết luận rằng sở thích sưu tầm tuy là \"simple activity\" (hoạt động đơn giản) nhưng có thể mang lại \"substantial benefits\" và làm cho cuộc sống \"more fulfilling\" (nhiều ý nghĩa/lợi ích nâng tầm cuộc sống)." }
+                ],
+                studentAnswers: new Array(10).fill(null),
+                newVocab: [
+                    { word: "Occupied", ipa: "/ˈɑːkjupaɪd/", type: "adj", meaning: "Bận rộn, bị chiếm dụng (tâm trí/thời gian)" },
+                    { word: "Temporarily", ipa: "/ˌtempəˈrerəli/", type: "adv", meaning: "Một cách tạm thời" },
+                    { word: "Passionate", ipa: "/ˈpæʃənət/", type: "adj", meaning: "Đam mê, say đắm" },
+                    { word: "Dedication", ipa: "/ˌdedɪˈkeɪʃn/", type: "n", meaning: "Sự cống hiến, tận tâm" },
+                    { word: "Persistence", ipa: "/pərˈsɪstəns/", type: "n", meaning: "Sự kiên trì, bền bỉ" },
+                    { word: "Tolerance", ipa: "/ˈtɑːlərəns/", type: "n", meaning: "Lòng khoan dung, sự chịu đựng" },
+                    { word: "Distinguish", ipa: "/dɪˈstɪŋɡwɪʃ/", type: "v", meaning: "Phân biệt" },
+                    { word: "Mutual", ipa: "/ˈmjuːtʃuəl/", type: "adj", meaning: "Chung, qua lại lẫn nhau" },
+                    { word: "Enthusiasm", ipa: "/ɪnˈθuːziæzəm/", type: "n", meaning: "Sự nhiệt huyết, hăng hái" },
+                    { word: "Substantial", ipa: "/səbˈstænʃl/", type: "adj", meaning: "Đáng kể, lớn lao" }
+                ]
+            },
+            {
+                type: "reading",
+                title: "READING COMPREHENSION",
+                sub: "BÀI LUYỆN ĐỌC 3",
+                passageTitle: "Artificial Intelligence in the Modern Era",
+                passageContent: [
+                    "In today’s fast-paced and highly connected era, artificial intelligence is having a significant impact on the way people live and work. Many students and workers are under constant pressure to improve their ability and stay competitive. Because of this, more people are becoming passionate about learning new technologies and trying to understand how AI can contribute to their success.",
+                    "AI is now used in many areas, including education, communication, and business. It can facilitate learning by helping students focus on difficult tasks and providing immediate feedback. As a result, students often make noticeable improvement in a short time. This gradual progress increases their motivation and encourages them to continue learning with more dedication and persistence.",
+                    "However, the development of AI also creates new challenges. Some people feel isolated because they depend too much on technology and have less real-life interaction. Others worry that AI may disrupt traditional jobs or encroach on human creativity. In addition, many workers feel mentally occupied and experience more stress, especially when they struggle to adapt to new systems. This situation can negatively affect their mental state and overall well-being.",
+                    "To deal with these problems, people need a positive mindset and strong commitment. Instead of avoiding technology, individuals should focus on developing new skills and learning how to work together with AI. With enough consistent effort, they can realize that AI is not only a challenge but also an avenue for personal and professional growth. Over time, their confidence becomes more noticeable, and their work becomes more meaningful.",
+                    "Overall, artificial intelligence plays a very important role in the modern world. Although it may create pressure, it also offers many beneficial opportunities. With the right mindset, persistence, and motivation, people can use AI to improve their lives."
+                ],
+                questions: [
+                    { q: "What is the topic of this passage?", options: ["The history of artificial intelligence in education.", "The impact of AI on modern life and how people can adapt to it.", "Why AI will completely replace traditional jobs.", "The negative effects of AI on human creativity."], ans: "B", exp: "Đoạn văn chủ yếu nói về tác động, lợi ích, thách thức của AI trong đời sống hiện đại và cách mọi người có thể thích nghi với nó." },
+                    { q: "According to paragraph 1, why are more people becoming passionate about learning new technologies?", options: ["Because they want to avoid real-life interactions.", "Because they are forced to use AI in their daily communication.", "Because they are under constant pressure to improve their ability and stay competitive.", "Because they want to become professional computer scientists."], ans: "C", exp: "Đoạn 1 nêu: \"Many students and workers are under constant pressure to improve their ability and stay competitive. Because of this, more people are becoming passionate about learning new technologies...\"" },
+                    { q: "The word \"facilitate\" in paragraph 2 is closest in meaning to ________.", options: ["make easier", "slow down", "complicate", "prevent"], ans: "A", exp: "\"Facilitate\" có nghĩa là tạo điều kiện thuận lợi, làm cho việc gì đó trở nên dễ dàng hơn (make easier)." },
+                    { q: "According to paragraph 2, the gradual progress students make ________.", options: ["makes them feel isolated from their friends.", "increases their motivation and encourages them to learn.", "negatively affects their mental state.", "disrupts their traditional ways of learning."], ans: "B", exp: "Đoạn 2 ghi rõ: \"This gradual progress increases their motivation and encourages them to continue learning...\"" },
+                    { q: "The word \"they\" in paragraph 3 refers to ________.", options: ["challenges", "new systems", "traditional jobs", "some people"], ans: "D", exp: "Trong câu \"Some people feel isolated because they depend too much...\", đại từ \"they\" dùng để thay thế cho \"Some people\"." },
+                    { q: "According to paragraph 3, which of the following is NOT a challenge created by the development of AI?", options: ["Feeling isolated due to dependence on technology.", "Decreasing the speed of online communication.", "Disrupting traditional jobs and human creativity.", "Experiencing more stress and mental occupation."], ans: "B", exp: "Đoạn 3 đề cập đến việc bị cô lập (isolated), phá vỡ công việc truyền thống (disrupt traditional jobs), và gây căng thẳng (stress). Việc giảm tốc độ giao tiếp trực tuyến KHÔNG được nhắc đến như một thách thức." },
+                    { q: "The phrase \"encroach on\" in paragraph 3 is closest in meaning to ________.", options: ["improve", "support", "intrude upon", "create"], ans: "C", exp: "\"Encroach on\" có nghĩa là lấn chiếm, xâm phạm, làm ảnh hưởng tiêu cực đến (intrude upon)." },
+                    { q: "It can be inferred from paragraph 4 that ________.", options: ["AI will automatically solve all personal and professional problems.", "avoiding technology is the best way to develop new skills.", "adapting to AI requires personal effort and a willingness to learn.", "only people with strong confidence can use AI effectively."], ans: "C", exp: "Đoạn 4 khuyên mọi người thay vì tránh né (avoiding) thì nên nỗ lực nhất quán (consistent effort) học cách làm việc cùng AI, từ đó suy ra việc thích nghi đòi hỏi sự nỗ lực cá nhân." },
+                    { q: "The word \"avenue\" in paragraph 4 is closest in meaning to ________.", options: ["street", "obstacle", "opportunity", "warning"], ans: "C", exp: "\"Avenue\" nghĩa đen là đại lộ, nhưng trong ngữ cảnh \"an avenue for personal and professional growth\" nó mang nghĩa bóng là con đường, cơ hội (opportunity) để phát triển." },
+                    { q: "According to the final paragraph, how can people use AI to improve their lives?", options: ["By avoiding AI whenever it creates pressure.", "By having the right mindset, persistence, and motivation.", "By waiting for AI to become less competitive.", "By completely ignoring the beneficial opportunities."], ans: "B", exp: "Đoạn cuối khẳng định: \"With the right mindset, persistence, and motivation, people can use AI to improve their lives.\"" }
+                ],
+                studentAnswers: new Array(10).fill(null),
+                newVocab: [
+                    { word: "Constant", ipa: "/ˈkɑːnstənt/", type: "adj", meaning: "Liên tục, không ngừng" },
+                    { word: "Competitive", ipa: "/kəmˈpetətɪv/", type: "adj", meaning: "Có tính cạnh tranh" },
+                    { word: "Facilitate", ipa: "/fəˈsɪlɪteɪt/", type: "v", meaning: "Tạo điều kiện thuận lợi, làm cho dễ dàng" },
+                    { word: "Noticeable", ipa: "/ˈnoʊtɪsəbl/", type: "adj", meaning: "Đáng chú ý, rõ rệt" },
+                    { word: "Disrupt", ipa: "/dɪsˈrʌpt/", type: "v", meaning: "Làm gián đoạn, phá vỡ" },
+                    { word: "Encroach on", ipa: "/ɪnˈkroʊtʃ ɑːn/", type: "phrs v", meaning: "Lấn chiếm, xâm phạm" },
+                    { word: "Occupied", ipa: "/ˈɑːkjupaɪd/", type: "adj", meaning: "Bận rộn, bị chiếm dụng (tâm trí)" },
+                    { word: "Avenue", ipa: "/ˈævənuː/", type: "n", meaning: "Con đường, phương thức, cơ hội" },
+                    { word: "Persistence", ipa: "/pərˈsɪstəns/", type: "n", meaning: "Sự kiên trì, bền bỉ" },
+                    { word: "Mindset", ipa: "/ˈmaɪndset/", type: "n", meaning: "Tư duy, nhận thức" }
+                ]
+            },
+            {
+                type: "dictation",
+                title: "BÀI LUYỆN NGHE",
+                sub: "DICTATION PRACTICE",
+                parts: [
+                    {
+                        title: "Bài nghe số 1",
+                        dialogueAudio: [
+                            { text: "Hey, how are you doing?", gender: 'male' },
+                            { text: "I’m good, thanks. Just a bit busy these days.", gender: 'female' },
+                            { text: "Same here. I’ve been thinking about finding something to help me relax after work.", gender: 'male' },
+                            { text: "You should take up a hobby. I recently started gardening, and it really helps me relieve stress and refresh my mind.", gender: 'female' },
+                            { text: "That sounds nice. I usually just stay at home and scroll on my phone, which isn’t very meaningful.", gender: 'male' },
+                            { text: "Yeah, hobbies can really promote well-being and improve your mental state. When I’m gardening, I can escape from daily pressures.", gender: 'female' },
+                            { text: "Do you think it’s difficult to start?", gender: 'male' },
+                            { text: "Not really. I did struggle at first, but with consistent effort, I’ve made noticeable improvement. It also helped me develop new skills.", gender: 'female' },
+                            { text: "I see. I’ve always been passionate about photography. Maybe I should try that.", gender: 'male' },
+                            { text: "That’s a great idea! It allows you to express emotions and capture better images. You can even build social connections with people who share the same interest.", gender: 'female' },
+                            { text: "Sounds really beneficial. I think I’ll make it part of my daily routine.", gender: 'male' }
+                        ],
+                        content: [
+                            { speaker: "A", text: "Hey, how are you doing?" },
+                            { speaker: "B", text: "I’m good, thanks. {blank} these days.", blanks: ["Just a bit busy"] },
+                            { speaker: "A", text: "Same here. I’ve been thinking about {blank} after work.", blanks: ["finding something to help me relax"] },
+                            { speaker: "B", text: "You should {blank}. I recently {blank}, and it really {blank}.", blanks: ["take up a hobby", "started gardening", "helps me relieve stress and refresh my mind"] },
+                            { speaker: "A", text: "That sounds nice. I {blank}, which isn’t very meaningful.", blanks: ["usually just stay at home and scroll on my phone"] },
+                            { speaker: "B", text: "Yeah, hobbies can really {blank}. When I’m gardening, I can {blank}.", blanks: ["promote well-being and improve your mental state", "escape from daily pressures"] },
+                            { speaker: "A", text: "Do you think {blank}?", blanks: ["it’s difficult to start"] },
+                            { speaker: "B", text: "Not really. I {blank} at first, but with consistent effort, {blank}. It also helped me develop new skills.", blanks: ["did struggle", "I’ve made noticeable improvement"] },
+                            { speaker: "A", text: "I see. {blank}. Maybe I should try that.", blanks: ["I’ve always been passionate about photography"] },
+                            { speaker: "B", text: "That’s a great idea! {blank}. You can even {blank} with people who {blank}.", blanks: ["It allows you to express emotions and capture better images", "build social connections", "share the same interest"] },
+                            { speaker: "A", text: "Sounds really beneficial. {blank}.", blanks: ["I think I’ll make it part of my daily routine"] }
+                        ]
+                    },
+                    {
+                        title: "Bài nghe số 2",
+                        dialogueAudio: [
+                            { text: "Hey, are you free this weekend?", gender: 'male' },
+                            { text: "Not really. I’m a bit occupied with work.", gender: 'female' },
+                            { text: "Oh, I was thinking of going out. There are two options: a movie or a short cycling trip, which sounds better to you?", gender: 'male' },
+                            { text: "Hmm, I’m more inclined to choose the cycling trip. It’s a good way to improve physical fitness.", gender: 'female' },
+                            { text: "That’s true. It can also help reduce stress.", gender: 'male' },
+                            { text: "Yeah, but I think I’ll stay home this time. I need to focus on finishing my project.", gender: 'female' }
+                        ],
+                        content: [
+                            { speaker: "A", text: "Hey, {blank} this weekend?", blanks: ["are you free"] },
+                            { speaker: "B", text: "Not really. {blank} with work.", blanks: ["I’m a bit occupied"] },
+                            { speaker: "A", text: "Oh, I was thinking of going out. There are two options: {blank}, which sounds better to you?", blanks: ["a movie or a short cycling trip"] },
+                            { speaker: "B", text: "Hmm, {blank}. It’s a good way {blank}", blanks: ["I’m more inclined to choose the cycling trip", "to improve physical fitness"] },
+                            { speaker: "A", text: "That’s true. {blank}.", blanks: ["It can also help reduce stress"] },
+                            { speaker: "B", text: "Yeah, but {blank}. I {blank}.", blanks: ["I think I’ll stay home this time", "need to focus on finishing my project"] }
+                        ]
+                    },
+                    {
+                        title: "Bài nghe số 3",
+                        dialogueAudio: [
+                            { text: "Hey, I’ve been really stressed lately. Work is just too much.", gender: 'male' },
+                            { text: "Yeah, I get that. Why don’t you take up a hobby or something?", gender: 'female' },
+                            { text: "Like what? I don’t really have time.", gender: 'male' },
+                            { text: "It doesn’t have to take a lot of time. I started cycling after work, and it really helps me relax.", gender: 'female' },
+                            { text: "Does it actually make a difference?", gender: 'male' },
+                            { text: "Yeah, it helps me forget about work for a while and feel more balanced. I also met some new friends who share the same interest.", gender: 'female' },
+                            { text: "That sounds nice. Maybe I should try painting or something creative.", gender: 'male' },
+                            { text: "You should! It’s a good way to improve your mood and reduce stress.", gender: 'female' }
+                        ],
+                        content: [
+                            { speaker: "A", text: "Hey, {blank}. Work is just too much.", blanks: ["I’ve been really stressed lately"] },
+                            { speaker: "B", text: "Yeah, I get that. {blank} or something?", blanks: ["Why don’t you take up a hobby"] },
+                            { speaker: "A", text: "Like what? {blank}.", blanks: ["I don’t really have time"] },
+                            { speaker: "B", text: "{blank}. I started cycling after work, and {blank}", blanks: ["It doesn’t have to take a lot of time", "it really helps me relax"] },
+                            { speaker: "A", text: "Does it actually make a difference?", blanks: [] },
+                            { speaker: "B", text: "Yeah, {blank}. I also met some new friends who share the same interest.", blanks: ["it helps me forget about work for a while and feel more balanced"] },
+                            { speaker: "A", text: "That sounds nice. {blank} painting or something creative.", blanks: ["Maybe I should try"] },
+                            { speaker: "B", text: "You should! {blank}.", blanks: ["It’s a good way to improve your mood and reduce stress"] }
+                        ]
+                    }
+                ],
+                studentAnswers: new Array(32).fill("")
+            },
+            {
+                type: "reflex",
+                title: "LUYỆN PHẢN XẠ TỪ VỰNG",
+                sub: "LISTENING REFLEX PRACTICE",
+                questions: buildReflexQuestions(),
+                studentAnswers: new Array(30).fill(null),
+                isStarted: false,
+                currentIndex: 0
+            }
+        ];
+
+        function switchLesson(index) {
+            saveCurrentState();
+
+            // Huỷ phát âm thanh nếu chuyển tab
+            if (currentLessonIndex === 4 && index !== 4) {
+                clearInterval(reflexTimerInterval);
+                window.speechSynthesis.cancel();
+            }
+            if (currentLessonIndex === 3 && index !== 3) {
+                if (currentlyPlayingPart !== null) {
+                    window.speechSynthesis.cancel();
+                    currentlyPlayingPart = null;
+                }
+            }
+
+            currentLessonIndex = index;
+            renderView();
+
+            if (currentLessonIndex === 4 && lessons[4] && lessons[4].isStarted && lessons[4].currentIndex < 30 && !isGlobalSubmitted) {
+                startReflexQuestion(); 
+            }
+        }
+
+        function saveCurrentState() {
+            if (isGlobalSubmitted) return;
+            const lesson = lessons[currentLessonIndex];
+            if (!lesson) return;
+            
+            if (lesson.type === "mcq" || lesson.type === "grammar_rules" || lesson.type === "reading") {
+                if(lesson.questions) {
+                    lesson.questions.forEach((q, i) => {
+                        const checked = document.querySelector(`input[name="q${i}"]:checked`);
+                        lesson.studentAnswers[i] = checked ? checked.value : null;
+                    });
+                }
+            } else if (lesson.type === "dictation") {
+                let blankIdx = 0;
+                lesson.parts.forEach(part => {
+                    part.content.forEach(line => {
+                        if (line.blanks) {
+                            line.blanks.forEach(() => {
+                                const el = document.getElementById(`d-input-${blankIdx}`);
+                                if (el) lesson.studentAnswers[blankIdx] = el.value.trim();
+                                blankIdx++;
+                            });
+                        }
+                    });
+                });
+            }
+        }
+
+        function renderView() {
+            const lesson = lessons[currentLessonIndex];
+            if (!lesson) return;
+
+            const container = document.getElementById('main-container');
+            container.classList.remove('grammar-grid'); // Removed old grammar CSS grid
+
+            document.querySelectorAll('.nav-pill').forEach((btn, i) => {
+                if(i === currentLessonIndex) btn.classList.add('active');
+                else btn.classList.remove('active');
+            });
+
+            document.getElementById('main-title').innerText = lesson.title;
+            document.getElementById('sub-title').innerText = lesson.sub;
+
+            const passageBox = document.getElementById('passage-content');
+            
+            // Bật tắt class 'article-content' để sử dụng Serif cho Bài Đọc và Sans-serif cho Hướng dẫn
+            if (lesson.type === "reading") {
+                passageBox.classList.add('article-content');
+            } else {
+                passageBox.classList.remove('article-content');
+            }
+
+            if (lesson.type === "reading") {
+                document.getElementById('left-heading').innerText = "NỘI DUNG BÀI ĐỌC";
+                
+                let vocabHtml = '';
+                if (lesson.newVocab && lesson.newVocab.length > 0) {
+                    vocabHtml = `
+                        <div class="mt-8 pt-8 border-t-2 border-indigo-200">
+                            <h3 class="text-xl font-bold text-indigo-900 mb-6 flex items-center gap-2">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832(5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253"></path></svg>
+                                TỪ VỰNG MỚI TRONG BÀI
+                            </h3>
+                            <div class="space-y-3">
+                                ${lesson.newVocab.map((v, idx) => `
+                                    <div class="flex items-center justify-between p-3 bg-white rounded-xl border border-indigo-100 shadow-sm hover:shadow-md transition-all">
+                                        <div class="text-[1.1rem]">
+                                            <span class="font-bold text-slate-500 mr-2">${idx + 1}.</span>
+                                            <span class="font-bold text-indigo-700">${v.word}</span> 
+                                            <span class="text-slate-500 font-medium ml-1">(${v.ipa})</span> 
+                                            <span class="text-orange-600 font-bold italic ml-1">${v.type}</span>
+                                            <span class="font-bold text-slate-800 ml-1">: ${v.meaning}</span>
+                                        </div>
+                                        <button onclick="speak('${v.word.replace(/'/g, "\\'")}')" class="ml-4 p-2 bg-indigo-50 text-indigo-600 rounded-full hover:bg-indigo-600 hover:text-white transition-colors flex-shrink-0">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /></svg>
+                                        </button>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                }
+
+                passageBox.innerHTML = `
+                    <div class="bg-indigo-50/60 p-6 md:p-8 rounded-[2rem] border-2 border-indigo-100 shadow-sm">
+                        <h2 class="text-2xl font-bold text-indigo-900 mb-6 text-center">${lesson.passageTitle}</h2>
+                        <div class="space-y-4 text-slate-800 text-[1.15rem] leading-[2rem] text-justify font-medium">
+                            ${lesson.passageContent.map(p => `<p>${p}</p>`).join('')}
+                        </div>
+                        ${vocabHtml}
+                    </div>`;
+            } else if (lesson.type === "reflex") {
+                document.getElementById('left-heading').innerText = "HƯỚNG DẪN";
+                passageBox.innerHTML = `
+                    <div class="bg-orange-50 p-8 rounded-[2rem] border-2 border-orange-100 shadow-sm">
+                        <p class="text-slate-800 font-bold text-[1.35rem] leading-snug mb-5">Bài tập luyện phản xạ từ vựng.</p>
+                        <ul class="text-slate-700 font-bold space-y-4 ml-6 list-disc text-[1.15rem]">
+                            <li>Hệ thống chọn ngẫu nhiên 30 từ vựng.</li>
+                            <li>Ở mỗi câu, máy sẽ tự động phát âm 1 từ.</li>
+                            <li>Bạn có <strong class="text-slate-800 font-bold">5 giây</strong> để nghe và chọn đáp án chính xác.</li>
+                            <li>Hết 5 giây, hệ thống tự động đánh sai và chuyển sang câu tiếp theo.</li>
+                        </ul>
+                    </div>`;
+            } else if (lesson.type === "dictation") {
+                document.getElementById('left-heading').innerText = "HƯỚNG DẪN BÀI NGHE";
+                passageBox.innerHTML = `
+                    <div class="bg-[#fdfbf7] p-8 rounded-[2rem] border border-orange-100 shadow-sm">
+                        <p class="text-slate-800 font-bold text-[1.35rem] leading-snug mb-5">Bài tập luyện nghe (Dictation).</p>
+                        <ul class="text-slate-700 font-bold space-y-4 ml-6 list-disc text-[1.15rem]">
+                            <li>Nhấn nút <strong class="text-slate-800 font-bold">Phát Audio Bài Nghe</strong> ở cột bên phải tương ứng với từng bài để máy đọc đoạn hội thoại.</li>
+                            <li>Nghe kỹ và điền từ còn thiếu vào các ô trống dạng hạt đậu.</li>
+                            <li>Bạn có thể dừng và nghe lại nhiều lần.</li>
+                            <li>Khi đã hoàn tất, nhấn "Nộp Toàn Bộ Bài Làm" để kiểm tra đáp án.</li>
+                        </ul>
+                    </div>`;
+            } else {
+                document.getElementById('left-heading').innerText = "HƯỚNG DẪN";
+                passageBox.innerHTML = `<div class="bg-orange-50 p-8 rounded-[2rem] border-2 border-orange-100"><p class="text-slate-800 font-bold text-[1.35rem] leading-snug">Hãy hoàn thành các bài tập ở cột bên phải để củng cố kiến thức ngữ pháp và từ vựng của Buổi 1.</p></div>`;
+            }
+
+            const contentBox = document.getElementById('content-box');
+            contentBox.innerHTML = '';
+            document.getElementById('right-title').innerText = isGlobalSubmitted ? "KẾT QUẢ CHI TIẾT" : "PHẦN LÀM BÀI";
+
+            if (lesson.type === "reflex" && !isGlobalSubmitted) {
+                if (!lesson.isStarted) {
+                    contentBox.innerHTML = `
+                        <div class="flex flex-col items-center justify-center h-full py-20 text-center fade-in">
+                            <h2 class="text-3xl font-bold text-indigo-900 mb-6 uppercase tracking-wider">Sẵn sàng luyện phản xạ?</h2>
+                            <p class="text-slate-600 mb-10 text-lg font-bold">Bạn sẽ có tối đa 5 giây cho mỗi từ.</p>
+                            <button onclick="startReflexGame()" class="px-12 py-5 bg-indigo-600 text-white font-bold text-xl rounded-full shadow-lg hover:bg-indigo-700 transition-all hover:scale-105 active:scale-95 uppercase">
+                                Bắt đầu ngay
+                            </button>
+                        </div>
+                    `;
+                } else if (lesson.currentIndex < 30) {
+                    const q = lesson.questions[lesson.currentIndex];
+                    contentBox.innerHTML = `
+                        <div class="bg-white p-8 rounded-[2rem] border border-indigo-100 shadow-md fade-in">
+                            <div class="flex justify-between items-center mb-10">
+                                <span class="text-2xl font-bold text-slate-800">Câu ${lesson.currentIndex + 1} / 30</span>
+                                <div class="flex items-center gap-3 text-orange-600 font-bold text-xl bg-orange-50 px-5 py-2.5 rounded-full border-2 border-orange-200">
+                                    <svg class="w-6 h-6 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                    <span id="reflex-timer">${reflexTimeLeft}s</span>
+                                </div>
+                            </div>
+                            <div class="flex justify-center mb-12">
+                                <button onclick="speak('${q.q.replace(/'/g, "\\'")}')" class="p-8 bg-indigo-50 text-indigo-600 rounded-full hover:bg-indigo-100 transition-colors shadow-sm border border-indigo-200 animate-bounce">
+                                    <svg class="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"></path></svg>
+                                </button>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                ${q.options.map((opt, oi) => `
+                                    <button onclick="handleReflexAnswer('${String.fromCharCode(65 + oi)}')" class="p-6 bg-white border-2 border-gray-300 rounded-3xl text-left hover:border-indigo-500 hover:shadow-md hover:bg-indigo-50 transition-all text-[1.35rem] font-bold text-slate-700 flex items-center gap-5">
+                                        <div class="w-7 h-7 rounded-full border-2 border-gray-400 flex-shrink-0 flex items-center justify-center bg-white"></div>
+                                        ${String.fromCharCode(65 + oi)}. ${opt}
+                                    </button>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    contentBox.innerHTML = `
+                        <div class="flex flex-col items-center justify-center h-full py-20 text-center bg-emerald-50 rounded-[2rem] border-2 border-emerald-100 fade-in">
+                            <span class="text-7xl mb-6">🎉</span>
+                            <h2 class="text-3xl font-extrabold text-emerald-900 mb-4 uppercase">Đã hoàn thành!</h2>
+                            <p class="text-emerald-800 text-lg font-bold">Bạn đã hoàn thành 30 câu hỏi phản xạ.<br>Vui lòng ấn "Nộp Toàn Bộ Bài Làm" ở dưới cùng để xem kết quả chi tiết.</p>
+                        </div>
+                    `;
+                }
+                return;
+            }
+
+            if (lesson.type === "dictation") {
+                let blankIdx = 0;
+                let questionNumber = 1;
+
+                lesson.parts.forEach((part, partIndex) => {
+                    const wrapper = document.createElement('div');
+                    wrapper.className = "bg-white p-6 md:p-8 rounded-[2rem] border shadow-sm fade-in mb-8 last:mb-0";
+                    
+                    // Nút Phát Audio lớn ở đầu mỗi bài
+                    wrapper.innerHTML = `
+                        <div class="flex flex-col items-center justify-center mb-10 border-b border-gray-100 pb-8">
+                            <h4 class="text-2xl font-bold text-[#6052FF] bg-white border-2 border-[#6052FF] px-6 py-2.5 rounded-xl mb-6 shadow-sm inline-block">${part.title}</h4>
+                            <button id="dictation-play-btn-${partIndex}" onclick="toggleDialoguePlay(${partIndex})" class="flex items-center justify-center px-8 py-4 bg-orange-100 text-orange-600 border-2 border-orange-300 rounded-full hover:bg-orange-200 transition-colors shadow-sm cursor-pointer focus:outline-none">
+                                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"></path></svg>
+                                <span class="ml-2 font-bold text-lg">Phát Audio Bài Nghe</span>
+                            </button>
+                        </div>
+                        <div class="space-y-8 text-lg text-slate-800" id="dictation-content-${partIndex}"></div>
+                    `;
+                    contentBox.appendChild(wrapper);
+                    
+                    const dictationContent = document.getElementById(`dictation-content-${partIndex}`);
+                    
+                    part.content.forEach((line) => {
+                        const lineDiv = document.createElement('div');
+                        lineDiv.className = "flex gap-4 items-start pb-4 border-b border-gray-100 last:border-0";
+                        
+                        let speakerBadge = `<div class="flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center font-bold text-xl text-white ${line.speaker === 'A' ? 'bg-indigo-500' : 'bg-pink-500'} shadow-sm">${line.speaker}</div>`;
+                        
+                        let textHtml = line.text;
+                        if (line.blanks && line.blanks.length > 0) {
+                            line.blanks.forEach((correct) => {
+                                const val = lesson.studentAnswers[blankIdx] || "";
+                                
+                                // Giao diện nhập liệu
+                                if (!isGlobalSubmitted) {
+                                    textHtml = textHtml.replace('{blank}', `
+                                        <div class="relative inline-block mx-1 align-middle my-1 w-[320px]">
+                                            <span class="absolute left-4 top-1/2 transform -translate-y-1/2 font-bold text-[#4338ca] text-[1.15rem] z-10 pointer-events-none">${questionNumber})</span>
+                                            <input type="text" id="d-input-${blankIdx}" class="dictation-input w-full" placeholder="Gõ câu trả lời..." value="${val}">
+                                        </div>
+                                    `);
+                                } else {
+                                    const isCorrect = isCorrectText(val, correct);
+                                    if (isCorrect) {
+                                        textHtml = textHtml.replace('{blank}', `
+                                            <span class="inline-block px-4 py-2 mx-1 my-2 bg-emerald-50 text-emerald-700 border-2 border-emerald-400 rounded-full font-bold align-middle">
+                                                <span class="text-slate-800 mr-1">${questionNumber})</span> ${val} <span class="text-emerald-500 ml-1 text-xl">✅</span>
+                                            </span>
+                                        `);
+                                    } else {
+                                        textHtml = textHtml.replace('{blank}', `
+                                            <div class="inline-block my-2 p-3 bg-red-50 border-2 border-red-300 rounded-3xl mx-1 align-middle min-w-[320px]">
+                                                <div class="text-sm font-bold text-red-500 mb-1 border-b border-red-200 pb-1">
+                                                    <span class="text-slate-800 font-bold mr-1">${questionNumber})</span> ❌ Câu trả lời của bạn:
+                                                </div>
+                                                <div class="mb-3 mt-2 font-bold text-slate-800 text-center">${val || '(Trống)'}</div>
+                                                <div class="text-sm font-bold text-emerald-600 border-t border-red-200 pt-2 text-center uppercase">Đáp án chuẩn:</div>
+                                                <div class="font-bold text-emerald-700 text-center text-[1.1rem] mt-1">${correct}</div>
+                                            </div>
+                                        `);
+                                    }
+                                }
+                                blankIdx++;
+                                questionNumber++;
+                            });
+                        }
+                        
+                        lineDiv.innerHTML = `${speakerBadge}<div class="flex-grow pt-1 leading-loose font-medium text-[1.2rem] text-slate-700">${textHtml}</div>`;
+                        dictationContent.appendChild(lineDiv);
+                    });
+                });
+                
+                // Đồng bộ giao diện nút play/stop
+                renderDictationSpeakerBtns();
+                return;
+            }
+
+            if (lesson.questions && lesson.questions.length > 0) {
+                lesson.questions.forEach((item, i) => {
+                    const div = document.createElement('div');
+                    div.className = "fade-in transition-all p-8 bg-white rounded-[2rem] border shadow-sm mb-6";
+
+                    if (lesson.type === "mcq" || lesson.type === "reading") {
+                        const userSel = lesson.studentAnswers[i];
+                        if (!isGlobalSubmitted) {
+                            div.innerHTML = `<p class="text-[1.35rem] font-bold text-slate-800 mb-6 leading-snug">${i+1}. ${item.q}</p><div class="grid grid-cols-1 gap-3">${item.options.map((opt, oi) => `<label class="flex items-center gap-4 p-4 border-2 rounded-2xl cursor-pointer hover:bg-indigo-50 transition-all shadow-sm"><input type="radio" name="q${i}" value="${String.fromCharCode(65 + oi)}" ${userSel === String.fromCharCode(65 + oi) ? 'checked' : ''} class="w-5 h-5 accent-indigo-600"><span class="text-gray-800 font-bold text-lg">${String.fromCharCode(65 + oi)}. ${opt}</span></label>`).join('')}</div>`;
+                        } else {
+                            const isCorrect = userSel === item.ans;
+                            const iconHTML = isCorrect ? `✅` : `❌`;
+                            div.classList.add(isCorrect ? 'correct-bg' : 'wrong-bg');
+                            div.innerHTML = `
+                                <div class="flex items-start gap-4">
+                                    <span class="text-2xl mt-1">${iconHTML}</span>
+                                    <div class="flex-grow">
+                                        <p class="text-[1.35rem] font-bold text-slate-800 mb-5 leading-snug">${i+1}. ${item.q}</p>
+                                        <div class="grid grid-cols-1 gap-2">${item.options.map((opt, oi) => {const char = String.fromCharCode(65 + oi); return `<div class="p-3 border-2 rounded-xl text-lg ${item.ans === char ? 'bg-green-50 border-green-500 font-bold text-green-700' : (userSel === char ? 'bg-red-50 border-red-500 text-red-700' : 'bg-white opacity-40')}">${char}. ${opt}</div>`}).join('')}</div>
+                                        <p class="mt-4 text-sm font-bold text-indigo-800">Ghi chú: ${item.exp}</p>
+                                    </div>
+                                </div>`;
+                        }
+                    }
+                    contentBox.appendChild(div);
+                });
+            }
+        }
+
+        function handleGlobalSubmit() {
+            const name = document.getElementById('user-name').value.trim();
+            if(!name) { alert("VUI LÒNG NHẬP HỌ VÀ TÊN!"); return; }
+            saveCurrentState();
+            
+            clearInterval(reflexTimerInterval);
+            window.speechSynthesis.cancel();
+            currentlyPlayingPart = null;
+            
+            isGlobalSubmitted = true;
+            
+            // Tính toán điểm số toàn bộ bài thi
+            let totalScore = 0;
+            let totalQs = 0;
+            lessons.forEach(lesson => {
+                if (lesson.type === "mcq" || lesson.type === "reading" || lesson.type === "reflex") {
+                    if(!lesson.questions) return;
+                    lesson.questions.forEach((q, i) => {
+                        totalQs++;
+                        if (lesson.studentAnswers[i] === q.ans) totalScore++;
+                    });
+                } else if (lesson.type === "dictation") {
+                     let blankIdx = 0;
+                     lesson.parts.forEach(part => {
+                         part.content.forEach(line => {
+                             if (line.blanks) {
+                                 line.blanks.forEach((ansString) => {
+                                     totalQs++;
+                                     const val = lesson.studentAnswers[blankIdx] || "";
+                                     if (isCorrectText(val, ansString)) totalScore++;
+                                     blankIdx++;
+                                 });
+                             }
+                         });
+                     });
+                }
+            });
+
+            // Hiển thị khung điểm ở footer
+            document.getElementById('result-status').innerHTML = `
+                <div class="flex items-center gap-6 bg-indigo-700 text-white px-10 py-4 rounded-2xl shadow-xl border-2 border-white/20">
+                    <div>
+                        <p class="font-bold text-2xl tracking-tight uppercase text-yellow-300 drop-shadow-md">ĐIỂM SỐ: ${totalScore} / ${totalQs}</p>
+                        <p class="text-sm font-bold uppercase opacity-90 mt-1">Đã nộp bài thành công</p>
+                    </div>
+                    <div class="w-px h-12 bg-white/30"></div>
+                    <p class="text-[11px] font-bold uppercase opacity-80 max-w-[150px]">Xem lại lỗi sai có dấu ❌ ở các Tab</p>
+                </div>
+            `;
+            document.getElementById('result-status').classList.remove('hidden');
+
+            emailjs.send('Datha_10090507', 'template_h1hch87', { student_name: name, score: `${totalScore} / ${totalQs}`, test_name: "Session 1 Final" });
+            renderView();
+            document.getElementById('result-status').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        window.onload = () => renderView();
+    </script>
+</body>
+</html>
